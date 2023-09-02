@@ -54,7 +54,7 @@ plot_data <- function(x){
          )
   }
 }
-plot_data(stock_data)
+plot_data(commodities_data)
 
 # Jarque-Bera tests ###########################################################
 jarque.bera.test(Oil)
