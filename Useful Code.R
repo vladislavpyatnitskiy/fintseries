@@ -34,6 +34,28 @@ plot(Cocoa, type = "l", main = "Cocoa Price Fluctuations", sub = "Source: Yahoo 
 # Coffee ----------------------------------------------------------------
 plot(Coffee, type = "l", main = "Coffee Price Fluctuations", sub = "Source: Yahoo Finance", xlab = "Date", ylab = "Price in US$")
 
+# More advanced path of plot creation
+
+plot_data <- function(x){
+  # For each column in data set
+  for (n in 1:ncol(x)){
+    # Take names from columns
+    plot_data_names <- colnames(x[,n])
+    
+    # Put them in string to be reflected in the main of the plot
+    main_plot_data <- sprintf("%s Performance", plot_data_names)
+    
+    # Plot finally
+    plot(x[,n],
+         main = main_plot_data,
+         sub = "Source: Yahoo! Finance",
+         xlab = "Trading Days",
+         ylab = "Price in US$"
+         )
+  }
+}
+plot_data(stock_data)
+
 # Jarque-Bera tests ###########################################################
 jarque.bera.test(Oil)
 jarque.bera.test(Natural.Gas)
@@ -45,24 +67,30 @@ jarque.bera.test(Coffe)
 
 # Autocorrelation tests ##################################################
 
-# Calculate Commodities Autocorrelation Functions #############################################
+autocorrelation_plots <- function(x){
+  # Calculate Returns
+  x <- diff(log(x))
+  
+  # Get rid of NA
+  x <- x[-1,]
+  
+  # For each column
+  for (n in 1:ncol(x)){
+    # Take names from columns
+    name_for_autocorrelation <- colnames((x[,n]))
+    
+    # Put them in string to be reflected in the main of the plot
+    main_for_autocorrelation <- sprintf("%s Series", name_for_autocorrelation)
+    
+    # Plot acf
+    acf((x[,n]), main = main_for_autocorrelation)
+    
+    # Plot pacf
+    pacf((x[,n]), main = main_for_autocorrelation)
+  }
+}
 
-# Examples -------------------------------------------------------------
-acfoil <- acf(Oil)
-acfng <- acf(Natural.Gas)
-acfgol <- acf(Gold)
-acfsil <- acf(Silver)
-acfcor <- acf(Corn)
-acfcoc <- acf(Cocoa)
-acfcof <- acf(Coffee)
-
-pacfoil <- pacf(Oil)
-pacfng <- pacf(Natural.Gas)
-pacfgol <- pacf(Gold)
-pacfsil <- pacf(Silver)
-pacfcor <- pacf(Corn)
-pacfcoc <- pacf(Cocoa)
-pacfcof <- pacf(Coffee)
+autocorrelation_plots(commodities_data)
 
 # Augmented Dickey-Fuller test  #########################################
 
