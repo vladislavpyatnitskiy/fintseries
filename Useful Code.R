@@ -2,7 +2,7 @@
 
 install.packages("tseries")
 install.packages("quantmod")
-
+library(fBasics)
 # Upload Data from Excel #############################################
 
 library(readxl)
@@ -64,6 +64,13 @@ jarque.bera.test(Silver)
 jarque.bera.test(Corn)
 jarque.bera.test(Cocoa)
 jarque.bera.test(Coffe)
+
+test_for_jb <- function(x){
+  x <- diff(log(x))[-1,]
+  apply(x, 2, function(col) jarqueberaTest(col))
+}
+
+test_for_jb(commodities_data)
 
 # Autocorrelation tests ##################################################
 
