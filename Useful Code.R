@@ -37,22 +37,16 @@ plot(Coffee, type = "l", main = "Coffee Price Fluctuations", sub = "Source: Yaho
 # More advanced path of plot creation
 
 plot_data <- function(x){
+  
   # For each column in data set
-  for (n in 1:ncol(x)){
-    # Take names from columns
-    plot_data_names <- colnames(x[,n])
-    
-    # Put them in string to be reflected in the main of the plot
-    main_plot_data <- sprintf("%s Performance", plot_data_names)
-    
-    # Plot finally
-    plot(x[,n],
-         main = main_plot_data,
+  for (n in 1:ncol(x)){ security <- x[,n]
+        
+    # Plot
+    plot(security,
+         main = sprintf("%s Performance", colnames(security),
          sub = "Source: Yahoo! Finance",
          xlab = "Trading Days",
-         ylab = "Price in US$"
-         )
-  }
+         ylab = "Price in US$") }
 }
 plot_data(commodities_data)
 
@@ -75,25 +69,18 @@ test_for_jb(commodities_data)
 # Autocorrelation tests ##################################################
 
 autocorrelation_plots <- function(x){
-  # Calculate Returns
-  x <- diff(log(x))
   
-  # Get rid of NA
-  x <- x[-1,]
+  # Logs without NA
+  x <- diff(log(x))[-1,]
   
   # For each column
-  for (n in 1:ncol(x)){
-    # Take names from columns
-    name_for_autocorrelation <- colnames((x[,n]))
-    
-    # Put them in string to be reflected in the main of the plot
-    main_for_autocorrelation <- sprintf("%s Series", name_for_autocorrelation)
+  for (n in 1:ncol(x)){ security <- x[,n]
     
     # Plot acf
-    acf((x[,n]), main = main_for_autocorrelation)
+    acf(security, main = sprintf("%s Series", colnames(security)))
     
     # Plot pacf
-    pacf((x[,n]), main = main_for_autocorrelation)
+    pacf(security, main = sprintf("%s Series", colnames(security)))
   }
 }
 
