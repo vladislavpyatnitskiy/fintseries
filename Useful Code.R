@@ -1,8 +1,7 @@
 # Open appropriate packages ##########################################
 
-install.packages("tseries")
-install.packages("quantmod")
-library(fBasics)
+lapply(c("quantmod","timeSeries","fBasics"),require,character.only=T) # Library
+
 # Upload Data from Excel #############################################
 
 library(readxl)
@@ -13,43 +12,17 @@ attach(data)
 
 # Plot Price Fluctuations across Commodities ##########################################
 
-# Oil -----------------------------------------------------------------------
-plot(Oil, type = "l", main = "Oil Price Fluctuations", sub = "Source: Yahoo Finance", xlab = "Trading Days", ylab = "Price in US$")
-
-# Natural Gas -------------------------------------------------------
-plot(Natural.Gas, type = "l", main = "Natural Gas Price Fluctuations", sub = "Source: Yahoo Finance", xlab = "Date", ylab = "Price in US$")
-
-# Gold --------------------------------------------------------------
-plot(Gold, type = "l", main = "Gold Price Fluctuations", sub = "Source: Yahoo Finance", xlab = "Date", ylab = "Price in US$")
-
-# Silver -------------------------------------------------------------
-plot(Silver, type = "l", main = "Silver Price Fluctuations", sub = "Source: Yahoo Finance", xlab = "Date", ylab = "Price in US$")
-
-# Corn ----------------------------------------------------------------
-plot(Corn, type = "l", main = "Corn Price Fluctuations", sub = "Source: Yahoo Finance", xlab = "Date", ylab = "Price in US$")
-
-# Cocoa -------------------------------------------------------------------- 
-plot(Cocoa, type = "l", main = "Cocoa Price Fluctuations", sub = "Source: Yahoo Finance", xlab = "Date", ylab = "Price in US$")
-
-# Coffee ----------------------------------------------------------------
-plot(Coffee, type = "l", main = "Coffee Price Fluctuations", sub = "Source: Yahoo Finance", xlab = "Date", ylab = "Price in US$")
-
 # More advanced path of plot creation
 
 plot_data <- function(x){
   
-  # For each column in data set
-  for (n in 1:ncol(x)){ security <- x[,n]
-        
-    # Plot
-    plot(security,
-         main = sprintf("%s Performance", colnames(security),
-         sub = "Source: Yahoo! Finance",
-         xlab = "Trading Days",
-         ylab = "Price in US$") }
+  for (n in 1:ncol(x)){ s <- x[,n] # For each column in data set
+  
+  # Plot
+  plot(s, main = sprintf("%s Price Fluctuations", colnames(s)), type = "l",
+       sub="Source: Yahoo! Finance",xlab="Trading Days",ylab="Price in US$") }
 }
 plot_data(commodities_data)
-
 # Jarque-Bera tests ###########################################################
 jarque.bera.test(Oil)
 jarque.bera.test(Natural.Gas)
