@@ -1,17 +1,10 @@
-# Function to plot both ACF and PACF
-autocorrelation_plots <- function(x, lg = T){
+autocorrelation.plt <- function(x, lg = T){ # Plot both ACF and PACF
   
-  # Calculate Returns and remove NA if applicable
-  if (isTRUE(lg)) { x = diff(log(x))[-1,] }
+  if (isTRUE(lg)) { x = diff(log(x))[-1,] } # Make logs and remove NA if needed
   
-  # For each column define variable and create plot
-  for (n in 1:ncol(x)){ security <- x[,n]
-    
-    # ACF
-    acf(security, main = sprintf("%s Series", colnames(security)))
-    
-    # PACF
-    pacf(security, main = sprintf("%s Series", colnames(security))) }
+  for (n in 1:ncol(x)){ s <- x[,n] # Plots for each column
+  
+    acf(s, main = sprintf("%s Series", colnames(s)), las = 1) # ACF
+    pacf(s, main = sprintf("%s Series", colnames(s)), las = 1) } # PACF
 }
-# Test
-autocorrelation_plots(stock_data)
+autocorrelation.plt(stock_data) # Test
