@@ -1,52 +1,44 @@
 # Function to get decomposition plot
 decomposition.plt <- function(x, lg = F, stat.measure = median){
   
-  l <- NULL # 
+  l <- NULL 
   
-  for (n in 1:ncol(x)){ j <- x[,n] #
+  for (n in 1:ncol(x)){ j <- x[,n]
   
-    if (isTRUE(lg)){ f.df <- diff(log(j)) # Calculate logs
+    if (isTRUE(lg)){ j <- diff(log(j))[-1,] } # Calculate logs
     
-      f.df[1,] <- 0 } else { f.df <- j } 
+    j <- data.frame(as.Date(rownames(j)), j) # Join main data set
     
-    r.rownames <- rownames(f.df) # Take dates from index column
+    rownames(j) <- seq(nrow(j)) # Create sequence for index column
     
-    r.rownames <- as.Date(r.rownames) # Make it in date format
+    D <- NULL # Define variable to contain values
     
-    f.df <- data.frame(r.rownames, f.df) # Join it with main data set
-    
-    rownames(f.df) <- seq(nrow(f.df)) # Create sequence for index column
-    
-    p.df <- NULL # Define variable to contain values
-    
-    for (n in 2:ncol(f.df)){ s <- f.df[,n] # Loop to make monthly data
+    for (n in 2:ncol(j)){ s <- j[,n] # Loop to make monthly data
     
       # Convert daily data to monthly
-      v <- tapply(s, format(as.Date(f.df[,1]), "%Y-%m"), stat.measure)
+      v <- tapply(s, format(as.Date(j[,1]), "%Y-%m"), stat.measure)
       
-      df.rownames <- rownames(v) # Take dates from index column
-      
-      v <- data.frame(df.rownames, v) # Join with new data set
+      v <- data.frame(as.data.frame(rownames(v)), v) # Join with new data set
       
       rownames(v) <- seq(nrow(v)) # Generate sequence for index column
       
-      colnames(v)[colnames(v) == 'df.rownames'] <- 'Date' # Name column as Date
+      colnames(v)[1] <- 'Date' # Name column as Date
       
-    # If defined empty variable is still empty # Put new dataset there
-    if (is.null(p.df)){ p.df<-v } else { p.df<-merge(x=p.df,y=v,by="Date")} }
+      # If defined empty variable is still empty # Put new dataset there
+      if (is.null(D)){ D <- v } else { D <- merge(x = D, y = v, by = "Date")} }
+      
+    D <- as.data.frame(D) # Convert to data frame format
     
-    p.df <- as.data.frame(p.df) # Convert to data frame format
+    colnames(D) <- colnames(D) # Give column names
     
-    colnames(p.df) <- colnames(f.df) # Give column names
+    colnames(D)[1] <- 'Date'
     
-    colnames(p.df)[colnames(p.df) == colnames(p.df[1])] <- 'Date'
-    
-    test.dec <- decompose(ts(p.df[,-1], frequency = 12), "multiplicative")
+    test.dec <- decompose(ts(D[,-1], frequency = 12), "multiplicative")
     
     decom.plt <- plot(test.dec) # Assign plot
     
     l <- list(l, decom.plt) } # Join plots
-  
-  l # Display
+    
+    l # Display
 }
 decomposition.plt(prices.yahoo(c("ZIM", "AAPL"), "2020-01-01")) # Test
