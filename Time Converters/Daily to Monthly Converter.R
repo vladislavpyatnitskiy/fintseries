@@ -1,43 +1,32 @@
-r.montly <- function(x, stat.measure = median, lg = F){
+r.montly <- function(x){ # Function to make data frame with monthly returns
   
-  if (isTRUE(lg)){ f.df <- diff(log(x)) # Calculate logs
-
-    f.df[1,] <- 0 } else {  # Assign first log as 0
+  x <- diff(log(x))[-1,] # Calculate logs
   
-    f.df <- x } 
-      
-  r.rownames <- rownames(f.df) # Take dates from index column
+  x <- data.frame(as.Date(rownames(x)), x) # Join it with main data set
   
-  r.rownames <- as.Date(r.rownames) # Make it in date format
+  rownames(x) <- seq(nrow(x)) # Create sequence for index column
   
-  f.df <- data.frame(r.rownames, f.df) # Join it with main data set
+  D <- NULL # Define variable to contain values
   
-  rownames(f.df) <- seq(nrow(f.df)) # Create sequence for index column
+  for (n in 2:ncol(x)){ s <- x[,n] # Loop to make monthly data
   
-  p.df <- NULL # Define variable to contain values
-  
-  for (n in 2:ncol(f.df)){ s <- f.df[,n] # Loop to make monthly data
-  
-    # Convert daily data to monthly
-    v <- tapply(s, format(as.Date(f.df[,1]), "%Y-%m"), stat.measure)
+    v <- tapply(s, format(as.Date(x[,1]), "%Y-%m"), sum) # daily to monthly
     
-    df.rownames <- rownames(v) # Take dates from index column
-    
-    v <- data.frame(df.rownames, v) # Join with new data set
+    v <- data.frame(rownames(v), v) # Join with new data set
     
     rownames(v) <- seq(nrow(v)) # Generate sequence for index column
     
-    colnames(v)[colnames(v) == 'df.rownames'] <- 'Date' # Name column as Date
+    colnames(v)[1] <- 'Date' # Name column as Date
     
     # If defined empty variable is still empty # Put new dataset there
-    if (is.null(p.df)){ p.df<-v } else { p.df <- merge(x=p.df,y=v,by="Date")} }
+    if (is.null(D)){ D <- v } else { D <- merge(x = D, y = v, by = "Date") } }
+    
+  D <- as.data.frame(D) # Convert to data frame format
   
-  p.df <- as.data.frame(p.df) # Convert to data frame format
+  colnames(D) <- colnames(x) # Give column names
   
-  colnames(p.df) <- colnames(f.df) # Give column names
+  colnames(D)[1] <- 'Date'
   
-  colnames(p.df)[colnames(p.df) == colnames(p.df[1])] <- 'Date'
-  
-  return(p.df) # Rename again
+  D # Display
 }
-r.montly(stock_data, stat.measure = median, lg = F) # Test
+r.montly(stock_data) # Test
