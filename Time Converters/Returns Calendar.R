@@ -3,28 +3,20 @@ lapply(c("quantmod", "timeSeries"), require, character.only = T) # Libs
 s.calendar <- function(x, s = NULL, e = NULL, transpose = F, data = T){
   
   if (isTRUE(data)){ p <- NULL # Loop for data extraction 
+  
+    src <- "yahoo"
     
-    for (A in x){ if (is.null(s) && is.null(e)) { # neither dates are defined
-      
-        p <- cbind(p, getSymbols(A, src = "yahoo", auto.assign = F)[,4])
-        
-      } else if (is.null(e)) { # When only start date is defined
-        
-        p <- cbind(p, getSymbols(A, from = s, src = "yahoo",auto.assign=F)[,4])
-        
-      } else if (is.null(s)) { # When only end date is defined
-        
-        p <- cbind(p,getSymbols(A, to = e, src = "yahoo", auto.assign = F)[,4])
-        
-      } else { # When both start date and end date are defined
-        
-        p <- cbind(p,getSymbols(A,from=s,to=e,src="yahoo",auto.assign=F)[,4]) }
-      }
+    getData <- function(A, s, e) {
+      if (is.null(s) && is.null(e)) return(getSymbols(A,src=src,auto.assign=F)) 
+      if (is.null(e)) return(getSymbols(A, from = s, src=src, auto.assign=F)) 
+      if (is.null(s)) return(getSymbols(A, to = e, src=src, auto.assign=F)) 
+      return(getSymbols(A, from = s, to = e, src=src, auto.assign=F)) 
+    }
+    for (A in x){ p <- cbind(p, getData(A, s, e)[,4]) } # Join data
+    
     p <- p[apply(p, 1, function(x) all(!is.na(x))),] # Get rid of NA
     
-    colnames(p) <- x # Put the tickers in data set
-    
-    } else { p <- x } # When data is not from Yahoo! 
+    colnames(p) <- x } else { p <- x } 
   
   r <- diff(log(as.timeSeries(p)))[-1,] # Calculate logs
   
